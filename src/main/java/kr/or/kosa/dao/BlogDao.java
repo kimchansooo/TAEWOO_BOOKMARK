@@ -3,6 +3,7 @@ package kr.or.kosa.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -194,19 +195,69 @@ public class BlogDao implements BookMarkDao{
 	}
 	
 	//댓글 작성
-	public int replyWrite(String blog_no) {
+	public int replyWrite(int blog_reply_no, int blog_no, String id, String content){
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		int resultrow = 0;
 		
 		//blog_reply_no를 지금은 받아주고 나중엔 안받아줘도 된다 ? ?
+		//원댓글 쓸 땐 blog_reply_no = refer
+		try {
+			conn = ds.getConnection();
+			String sql = "insert into blog_reply(blog_reply_no, blog_no, id, reply_content, del)"
+					+ " values(?,?,?,?,?)";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, blog_reply_no);
+			pstmt.setInt(2, blog_no);
+			pstmt.setString(3, id);
+			pstmt.setString(4, content);
+			pstmt.setInt(5, 0);
+			
+			resultrow = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			System.out.println("replyWrite 예외 : " + e.getMessage());
+		}finally {
+			try {
+				pstmt.close();
+				conn.close();
+			} catch (Exception e2) {
+				// TODO: handle exception
+			}
+		}
 		
-		return 0;
+		return resultrow;
 	}
 	//대댓글 작성
 	
 	//댓글 수정
 	
 	//댓글 삭제
+	public int replyDelete(int blog_reply_no) {
+		int result = 0;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+
+		try {
+			conn = ds.getConnection();
+			String sql = "delete from blog_reply where blog_reply_no = ?";
+			pstmt.setInt(1, blog_reply_no);
+			result = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			System.out.println("replyDelete 예외 : " + e.getMessage());
+		}finally {
+			try {
+				pstmt.close();
+				conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
 	
 }
