@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import kr.or.kosa.dao.BookMarkDao;
 import kr.or.kosa.dto.ReplyInterface;
 
-@WebServlet("/ReplyWrite")
+@WebServlet("/ReplyRewrite")
 public class ReplyRewriteService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
