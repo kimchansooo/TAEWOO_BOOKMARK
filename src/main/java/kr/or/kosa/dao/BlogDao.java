@@ -145,7 +145,7 @@ public class BlogDao implements BookMarkDao{
 	//글 삭제
 	
 	//특정 글 댓글 불러오기
-	public List<Blog_Reply> getReply(String blog_no) {
+	public List<Blog_Reply> getReply(int blog_no) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -159,6 +159,7 @@ public class BlogDao implements BookMarkDao{
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, blog_no);
 			//왜 blogDto에선 blog_no가 int인데 여기선 String이지 .. ??
+			//실수였대~int로 바꿨삼 221118 19:04
 			
 			rs = pstmt.executeQuery();
 			replylist = new ArrayList<>();
@@ -193,7 +194,16 @@ public class BlogDao implements BookMarkDao{
 	}
 	
 	//댓글 작성
-	
+	public int replyWrite(String blog_no) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		int resultrow = 0;
+		
+		//blog_reply_no를 지금은 받아주고 나중엔 안받아줘도 된다 ? ?
+		
+		return 0;
+	}
+	//대댓글 작성
 	
 	//댓글 수정
 	
