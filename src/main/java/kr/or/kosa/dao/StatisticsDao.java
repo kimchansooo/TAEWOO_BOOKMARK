@@ -81,9 +81,14 @@ public class StatisticsDao implements BookMarkDao {
 	
 	DataSource ds = null;
 	
-	public StatisticsDao() throws NamingException{
-		Context context = new InitialContext();
-		ds = (DataSource)context.lookup("java:comp/env/jdbc/oracle");
+	public StatisticsDao(){
+		try {
+			Context context = new InitialContext();
+			ds = (DataSource)context.lookup("java:comp/env/jdbc/oracle");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	//남녀 성비 통계
