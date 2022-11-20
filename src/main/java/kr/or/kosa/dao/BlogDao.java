@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Date;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +19,8 @@ import kr.or.kosa.dto.Blog_Reply;
 
 public class BlogDao implements BookMarkDao{
 
-	//autoCommit 어떻게 해야되는지?
+	//TODO : autoCommit 어떻게 해야되는지?
+	//TODO : 시퀀스 사용 제대로 되는지 확인
 	
 	DataSource ds = null;
 	
@@ -183,20 +184,24 @@ public class BlogDao implements BookMarkDao{
 			conn = ds.getConnection();
 			String boardsql = "insert into"
 					+ " blog_board(blog_no, id, blog_title, blog_content, hits)"
-					+ " values(?,?,?,?,?)";
+					+ " values(blog_no.nextval,?,?,?,?)";
 			pstmt = conn.prepareStatement(boardsql);
-			pstmt.setInt(1, board.getBlog_no());
-			pstmt.setString(2, board.getId());
-			pstmt.setString(3, board.getBlog_title());
-			pstmt.setString(4, board.getBlog_content());
-			pstmt.setInt(5, board.getHits());
+			
+			pstmt.setString(1, board.getId());
+			pstmt.setString(2, board.getBlog_title());
+			pstmt.setString(3, board.getBlog_content());
+			pstmt.setInt(4, board.getHits());
 			row = pstmt.executeUpdate();
 			//파일이 있다면 /////////////////////////
 			if(board.getBlog_filename() != null) {
 				pstmt.close();
 				String filesql = "insert into blogfile(blog_no, file_name) values(?,?)";
 				pstmt = conn.prepareStatement(filesql);
-				pstmt.setInt(1, board.getBlog_no());
+				pstmt.setInt(1, board.getBlog_no()); ////////////이 부분은 어떻게 해야될까??
+						//TODO : 블로그 파일 테이블 인덱스 처리하기
+						//블로그테이블에서는 nextval로 인덱스를 증가시켰는데
+						//모든 글이 파일을 가지고 있는건 아니니까 여기선 그렇게 하면 안되는데
+						//그럼 인덱스를 어떻게 같게 하지 ??
 				pstmt.setString(2, board.getBlog_filename());
 				pstmt.execute();
 			}
@@ -260,6 +265,7 @@ public class BlogDao implements BookMarkDao{
 		try {
 			conn = ds.getConnection();
 			String sql = "delete from blog_board where blog_no = ?";
+			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, blog_no);
 			row = pstmt.executeUpdate();
 		} catch (Exception e) {
@@ -330,15 +336,15 @@ public class BlogDao implements BookMarkDao{
 		try {
 			conn = ds.getConnection();
 			String sql = "insert into blog_reply(blog_reply_no, blog_no, id, refer, reply_content, del)"
-					+ " values(?,?,?,?,?)";
+					+ " values(blog_reply_no.nextval,?,?,?,?)";
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setInt(1, blog_reply_no);
-			pstmt.setInt(2, blog_no);
-			pstmt.setString(3, id);
-			pstmt.setInt(4, maxrefer);
-			pstmt.setString(5, content);
-			pstmt.setInt(6, 0); //del
+			//pstmt.setInt(1, blog_reply_no);
+			pstmt.setInt(1, blog_no);
+			pstmt.setString(2, id);
+			pstmt.setInt(3, maxrefer);
+			pstmt.setString(4, content);
+			pstmt.setInt(5, 0); //del
 			
 			resultrow = pstmt.executeUpdate();
 			
@@ -349,14 +355,14 @@ public class BlogDao implements BookMarkDao{
 				pstmt.close();
 				conn.close();
 			} catch (Exception e2) {
-				// TODO: handle exception
+				
 			}
 		}
 		
 		return resultrow;
 	}
 	
-	//댓글 refer 값 생성하기 ?
+	//TODO : 댓글 refer 값 생성하기 ?
 	private int getMaxRefer() {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -379,7 +385,7 @@ public class BlogDao implements BookMarkDao{
 				rs.close();
 				conn.close();
 			}catch (Exception e) {
-				// TODO: handle exception
+				
 			}
 		}
 		
@@ -395,7 +401,54 @@ public class BlogDao implements BookMarkDao{
 		int result = 0;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
+		ResultSet rs = null;
 		
+		try {
+			conn = ds.getConnection();
+			int blog_reply_no = reply.getBlog_reply_no(); //현재 댓글의 번호
+			//대댓글 작성하려는 원댓글
+			String originsql = "select refer, depth, step from blog_reply where blog_reply_no = ?";
+			//대댓글 insert 쿼리
+			String insertsql = "insert into blog_reply(blog_reply_no, id, refer, depth, step, reply_content, del) "
+					+ "values(blog_reply_no.nextval, ?, ?, ?, ?, ?, 0";
+			//여기 테이블에 시퀀스가 있나 ?? -> 만들라고 했삼 221120 16:05
+			
+			pstmt = conn.prepareStatement(originsql);
+			pstmt.setInt(1, blog_reply_no);
+			
+			rs = pstmt.executeQuery();
+			if(rs.next()) { //데이터가 존재한다면
+				int refer = rs.getInt("refer");
+				int step = rs.getInt("step");
+				int depth = rs.getInt("depth");
+				
+				pstmt = conn.prepareStatement(insertsql);
+				pstmt.setString(1, reply.getId());
+				pstmt.setInt(2, refer);
+				pstmt.setInt(3, depth + 1);
+				pstmt.setInt(4, step + 1);
+				pstmt.setString(5, reply.getReply_content());
+				
+				int row = pstmt.executeUpdate();
+				if(row > 0) {
+					result = row;
+				}else {
+					result = -1;
+				}
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				pstmt.close();
+				rs.close();
+				conn.close();
+			} catch (Exception e2) {
+				
+			}
+		}
 		
 		return result;
 	}
@@ -426,7 +479,7 @@ public class BlogDao implements BookMarkDao{
 				pstmt.close();
 				conn.close();
 			} catch (Exception e2) {
-				// TODO: handle exception
+				
 			}
 		}
 		
