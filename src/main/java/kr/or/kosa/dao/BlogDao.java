@@ -342,7 +342,7 @@ public class BlogDao implements BookMarkDao{
 			//pstmt.setInt(1, blog_reply_no);
 			pstmt.setInt(1, blog_no);
 			pstmt.setString(2, id);
-			pstmt.setInt(3, maxrefer);
+			pstmt.setInt(3, refer);
 			pstmt.setString(4, content);
 			pstmt.setInt(5, 0); //del
 			
@@ -497,6 +497,7 @@ public class BlogDao implements BookMarkDao{
 			conn = ds.getConnection();
 			//String sql = "delete from blog_reply where blog_reply_no = ?";
 			String sql = "update blog_reply set del = 1 where blog_reply_no = ?";
+			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, blog_reply_no);
 			result = pstmt.executeUpdate();
 			
