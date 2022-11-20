@@ -3,6 +3,7 @@ package kr.or.kosa.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -321,7 +322,7 @@ public class StatisticsDao implements BookMarkDao {
 		return ageArr;
 	}
 	
-	//TODO:연령 통계 쿼리로
+	//연령 통계 쿼리로
 	public List<Statistics> getAgeQuery(){
 		List<Statistics> ageArr = new ArrayList<>();
 		
@@ -353,6 +354,15 @@ public class StatisticsDao implements BookMarkDao {
 			}
 		} catch (Exception e) {
 			System.out.println("getAgeQuery 예외 : " + e.getMessage());
+		} finally {
+			try {
+				rs.close();
+				pstmt.close();
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
 		}
 
 		return ageArr;
@@ -396,6 +406,7 @@ public class StatisticsDao implements BookMarkDao {
 		return dailyarr;
 	}
 	
+	//TODO: 이 아래는 날짜 포맷이 정해지기 전까지 할 수가 없음...substr로 할 거라서...
 	//월별 매출 통계
 	
 	//주별 매출 통계
