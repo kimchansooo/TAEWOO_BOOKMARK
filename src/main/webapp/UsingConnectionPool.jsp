@@ -8,7 +8,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Toncat Connection Pool 사용하기</title>
+<title>Tomcat Connection Pool 사용하기</title>
 </head>
 <body>
 	<%
