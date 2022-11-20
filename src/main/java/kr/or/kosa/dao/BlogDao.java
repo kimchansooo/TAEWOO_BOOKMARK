@@ -465,6 +465,7 @@ public class BlogDao implements BookMarkDao{
 		PreparedStatement pstmt = null;
 		
 		try {
+			//TODO : 수정 시간 반영하기 (sysdate)
 			conn = ds.getConnection();
 			String sql = "update blog_reply set reply_content=? where blog_reply_no=?";
 			pstmt = conn.prepareStatement(sql);
