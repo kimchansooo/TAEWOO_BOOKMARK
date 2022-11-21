@@ -13,19 +13,22 @@ import kr.or.kosa.dao.BookMarkDao;
 import kr.or.kosa.dto.Blog_Board;
 import kr.or.kosa.utils.DaoFactory;
 
-public class BlogAllListService implements Action {
-//블로그 전체 조회 담고 관리자 페이지로
+public class BlogEnterService implements Action {
+//블로그 들어가는 서비스
+//파라미터로 이동할 블로그(blogid)를 받는다.
 	@Override
 	public ActionForward execute(HttpServletRequest request, HttpServletResponse response) {
 		ActionForward forward = new ActionForward();
 		
 		try {
 			BlogDao dao = new BlogDao();
-			List<Blog_Board> list = dao.AllBoard();
+			String blogid = request.getParameter("blogid");
+			List<Blog_Board> list = dao.getBoardListById(blogid);
 			
+			request.setAttribute("id", blogid);
 			request.setAttribute("blogboardlist", list);
 			
-			forward.setPath("관리자블로그게시글조회.do");
+			forward.setPath("블로그.jsp");
 			forward.setRedirect(false);
 		} catch (Exception e) {
 			e.printStackTrace();

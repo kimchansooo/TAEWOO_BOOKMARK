@@ -30,33 +30,87 @@ public class BlogDao implements BookMarkDao{
 	}
 	
 	//블로그 글 전체 불러오기
-	public List<Blog_Board> AllBoard(int cpage , int pagesize){
+	public List<Blog_Board> AllBoard(){//int cpage , int pagesize){
 		List<Blog_Board> boardList = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
 			conn = ds.getConnection();
-			String sql= "select blog_no, id, blog_title, blog_content, hits, blog_date from blog_board";
+			String sql=  "select a.blog_no, a.id, a.blog_title, a.blog_content, a.hits, a.blog_date, b.file_name "
+					+ "from blog_board a left join blogfile b "
+					+ "on a.blog_no = b.blog_no ";
 			pstmt = conn.prepareStatement(sql);
 			//공식같은 로직
-			int start = cpage * pagesize - (pagesize -1); //1 * 5 - (5 - 1) >> 1
-			int end = cpage * pagesize; // 1 * 5 >> 5
-			
-			pstmt.setInt(1, end);
-			pstmt.setInt(2, start);
+//			int start = cpage * pagesize - (pagesize -1); //1 * 5 - (5 - 1) >> 1
+//			int end = cpage * pagesize; // 1 * 5 >> 5
+//			
+//			pstmt.setInt(1, end);
+//			pstmt.setInt(2, start);
 			
 			rs = pstmt.executeQuery();
 			boardList = new ArrayList<>();
 			
 			while(rs.next()) {
 				Blog_Board board = new Blog_Board();
-				board.setBlog_no(rs.getInt("blog_no"));
-				board.setBlog_content(rs.getString("blog_content"));
-				board.setBlog_date(rs.getDate("blog_date")); //날짜
-				board.setBlog_title(rs.getString("blog_title"));
-				board.setHits(rs.getInt("hits"));
-				board.setId(rs.getString("id"));
+				board.setBlog_no(rs.getInt(1));//블로그 번호
+				board.setId(rs.getString(2)); //작성자
+				board.setBlog_title(rs.getString(3)); //제목
+				board.setBlog_content(rs.getString(4));//내용
+				board.setHits(rs.getInt(5));//조회수
+				board.setBlog_date(rs.getDate(6)); //날짜
+				board.setBlog_filename(rs.getString(7)); //파일이름
+				
+				boardList.add(board);
+			}
+			
+		}catch (Exception e) {
+			System.out.println("AllBoard 오류 : " + e.getMessage());
+		}finally {
+			try {
+				pstmt.close();
+				rs.close();
+				conn.close();
+			} catch (Exception e2) {
+				System.out.println(e2.getMessage());
+			}
+		}
+		
+		return boardList;
+	}
+	
+	//특정 아이디의 블로그 게시글 전체 조회 추가 김태우 (11.21)//블로그 글 전체 불러오기
+	public List<Blog_Board> getBoardListById(String id){//int cpage , int pagesize){
+		List<Blog_Board> boardList = null;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			conn = ds.getConnection();
+			String sql=  "select a.blog_no, a.id, a.blog_title, a.blog_content, a.hits, a.blog_date, b.file_name "
+					+ "from blog_board a left join blogfile b "
+					+ "on a.blog_no = b.blog_no where a.id = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, id);
+			//공식같은 로직
+//			int start = cpage * pagesize - (pagesize -1); //1 * 5 - (5 - 1) >> 1
+//			int end = cpage * pagesize; // 1 * 5 >> 5
+//			
+//			pstmt.setInt(1, end);
+//			pstmt.setInt(2, start);
+			
+			rs = pstmt.executeQuery();
+			boardList = new ArrayList<>();
+			
+			while(rs.next()) {
+				Blog_Board board = new Blog_Board();
+				board.setBlog_no(rs.getInt(1));//블로그 번호
+				board.setId(rs.getString(2)); //작성자
+				board.setBlog_title(rs.getString(3)); //제목
+				board.setBlog_content(rs.getString(4));//내용
+				board.setHits(rs.getInt(5));//조회수
+				board.setBlog_date(rs.getDate(6)); //날짜
+				board.setBlog_filename(rs.getString(7)); //파일이름
 				
 				boardList.add(board);
 			}
@@ -183,7 +237,8 @@ public class BlogDao implements BookMarkDao{
 			conn = ds.getConnection();
 			String boardsql = "insert into"
 					+ " blog_board(blog_no, id, blog_title, blog_content, hits)"
-					+ " values(blog_no.nextval,?,?,?,?)";
+					+ " values(blog_no_seq.nextval,?,?,?,?)";
+			//blog_no 에 _seq 추가 (11.21 김태우)
 			pstmt = conn.prepareStatement(boardsql);
 			
 			pstmt.setString(1, board.getId());
@@ -335,7 +390,8 @@ public class BlogDao implements BookMarkDao{
 		try {
 			conn = ds.getConnection();
 			String sql = "insert into blog_reply(blog_reply_no, blog_no, id, refer, reply_content, del)"
-					+ " values(blog_reply_no.nextval,?,?,?,?)";
+					+ " values(blog_reply_no_seq.nextval,?,?,?,?)";
+			//blog__reply_no_ 에 seq 추가 (11.21 김태우)
 			pstmt = conn.prepareStatement(sql);
 			
 			//pstmt.setInt(1, blog_reply_no);
@@ -409,8 +465,9 @@ public class BlogDao implements BookMarkDao{
 			String originsql = "select refer, depth, step from blog_reply where blog_reply_no = ?";
 			//대댓글 insert 쿼리
 			String insertsql = "insert into blog_reply(blog_reply_no, id, refer, depth, step, reply_content, del) "
-					+ "values(blog_reply_no.nextval, ?, ?, ?, ?, ?, 0";
+					+ "values(blog_reply_no_seq.nextval, ?, ?, ?, ?, ?, 0";
 			//여기 테이블에 시퀀스가 있나 ?? -> 만들라고 했삼 221120 16:05
+			//blog__reply_no_ 에 seq 추가 (11.21 김태우)
 			
 			pstmt = conn.prepareStatement(originsql);
 			pstmt.setInt(1, blog_reply_no);
