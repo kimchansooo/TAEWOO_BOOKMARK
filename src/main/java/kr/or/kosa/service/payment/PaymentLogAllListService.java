@@ -7,7 +7,7 @@ import kr.or.kosa.action.Action;
 import kr.or.kosa.action.ActionForward;
 
 public class PaymentLogAllListService implements Action {
-
+//관리자가 보는 리스트
 	@Override
 	public ActionForward execute(HttpServletRequest request, HttpServletResponse response) {
 		ActionForward forward = new ActionForward();
