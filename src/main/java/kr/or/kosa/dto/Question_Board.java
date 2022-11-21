@@ -14,6 +14,7 @@ public class Question_Board {
 	private int depth; //들여쓰기 정도
 	private int step; //그룹 내 순번
 	private int notice_no; //공지사항 유무( 0 일반게시글 | 1 공지사항)
+	public Question_Board() {}
 	public Question_Board(int question_no, String id, String question_title, String question_content, int hits,
 			Date question_date, int refer, int depth, int step, int notice_no) {
 		super();

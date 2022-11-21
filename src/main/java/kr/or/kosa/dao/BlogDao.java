@@ -37,7 +37,7 @@ public class BlogDao implements BookMarkDao{
 		ResultSet rs = null;
 		try {
 			conn = ds.getConnection();
-			String sql= "";
+			String sql= "select blog_no, id, blog_title, blog_content, hits, blog_date from blog_board";
 			pstmt = conn.prepareStatement(sql);
 			//공식같은 로직
 			int start = cpage * pagesize - (pagesize -1); //1 * 5 - (5 - 1) >> 1
@@ -54,9 +54,8 @@ public class BlogDao implements BookMarkDao{
 				board.setBlog_no(rs.getInt("blog_no"));
 				board.setBlog_content(rs.getString("blog_content"));
 				board.setBlog_date(rs.getDate("blog_date")); //날짜
-				board.setBlog_filename(rs.getString("blog_filename"));
 				board.setBlog_title(rs.getString("blog_title"));
-				board.setHits(rs.getInt("blog_hit"));
+				board.setHits(rs.getInt("hits"));
 				board.setId(rs.getString("id"));
 				
 				boardList.add(board);
