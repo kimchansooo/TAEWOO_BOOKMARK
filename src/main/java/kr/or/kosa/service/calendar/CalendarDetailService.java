@@ -1,7 +1,5 @@
 package kr.or.kosa.service.calendar;
 
-import java.text.SimpleDateFormat;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,7 +22,7 @@ public class CalendarDetailService implements Action {
 //		String calendar_content = request.getParameter("calendar_content");
 //		String calendar_status = request.getParameter("calendar_status");
 		
-		SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-DD");
+		//SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-DD");
 		
 		try {
 			if(calendar_no == null || calendar_no.trim().equals("")) {

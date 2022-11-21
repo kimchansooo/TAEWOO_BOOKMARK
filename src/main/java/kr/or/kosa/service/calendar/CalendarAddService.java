@@ -1,7 +1,5 @@
 package kr.or.kosa.service.calendar;
 
-import java.text.SimpleDateFormat;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,13 +32,14 @@ public class CalendarAddService implements Action {
 		//TODO : calendar에는 date가 어떤 포맷으로 들어가지...
 		//String으로 받은 date값 simple date format으로 date로...
 		
-		SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-DD");
+		//SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-DD");
+		DateFormatter formatter = new DateFormatter();
 		
 		try {
 			CalendarDao dao = new CalendarDao();
 			calendar.setCalendar_content(calendar_content);
-			calendar.setCalendar_start(formatter.parse(calendar_start));
-			calendar.setCalendar_end(formatter.parse(calendar_end));
+			calendar.setCalendar_start(formatter.dateParser(calendar_start));
+			calendar.setCalendar_end(formatter.dateParser(calendar_end));
 			//근데 status는 기본적으로 0으로 만들어지지 않나? default없나??
 			calendar.setCalendar_status(0);
 			

@@ -1,7 +1,5 @@
 package kr.or.kosa.service.calendar;
 
-import java.text.SimpleDateFormat;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,7 +22,8 @@ public class CalendarUpdateService implements Action {
 		String calendar_content = request.getParameter("calendar_content");
 		String calendar_status = request.getParameter("calendar_status");
 		
-		SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-DD");
+		//SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-DD");
+		DateFormatter formatter = new DateFormatter();
 		
 		String msg = "";
 		String url = "";
@@ -52,17 +51,26 @@ public class CalendarUpdateService implements Action {
 			}
 			
 			//수정사항 반영
-			calendar.setCalendar_start(formatter.parse(calendar_start));
-			calendar.setCalendar_end(formatter.parse(calendar_end));
+			calendar.setCalendar_start(formatter.dateParser(calendar_start));
+			calendar.setCalendar_end(formatter.dateParser(calendar_end));
 			calendar.setCalendar_content(calendar_content);
 			calendar.setCalendar_status(Integer.parseInt(calendar_status));
 			
 			int result = dao.CalendarUpdate(calendar);
 			
-			request.setAttribute("calendar", calendar);
+			if(result > 0) {
+				msg = "캘린더 수정 성공";
+				url = ""; //TODO:리스트로 뷰 지정
+			}else {
+				msg = "캘린더 수정 실패";
+				url ="";//TODO:리스트로 뷰 지정
+			}
+			
+			request.setAttribute("msg", msg);
+			request.setAttribute("url", url);
 			
 			forward.setRedirect(false);
-			//TODO:뷰 지정
+			//TODO:뷰 지정 리다이렉트.jsp
 			forward.setPath("");
 			
 		} catch (Exception e) {
