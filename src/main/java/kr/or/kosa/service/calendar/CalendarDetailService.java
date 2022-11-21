@@ -44,7 +44,7 @@ public class CalendarDetailService implements Action {
 //			calendar.setCalendar_status(0);
 			
 			forward.setRedirect(false);
-			forward.setPath("");//TODO: 디테일 뷰 지정
+			forward.setPath("/views/calendarpage.jsp");//TODO: 디테일 뷰 지정
 			
 		} catch (Exception e) {
 			
