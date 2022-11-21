@@ -1,4 +1,4 @@
-package kr.or.kosa.service.payment;
+package kr.or.kosa.popup;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 import kr.or.kosa.action.Action;
 import kr.or.kosa.action.ActionForward;
 
-public class PaymentLogAllListService implements Action {
-//관리자가 보는 리스트
+public class PopupLikeListService implements Action {
+
 	@Override
 	public ActionForward execute(HttpServletRequest request, HttpServletResponse response) {
 		ActionForward forward = new ActionForward();

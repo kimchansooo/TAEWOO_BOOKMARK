@@ -5,7 +5,7 @@ import java.util.Date;
 public class Blog_Reply implements ReplyInterface{
 	//블로그 댓글 DTO
 	private int blog_reply_no; //댓글 번호
-	private String blog_no; //게시글 번호
+	private int blog_no; //게시글 번호
 	private String id; //작성자 아이디
 	private Date reply_date; //작성일
 	private String reply_content; //댓글 내용
@@ -13,7 +13,7 @@ public class Blog_Reply implements ReplyInterface{
 	private int depth; //들여쓰기 정도
 	private int step; //그룹내 순서
 	private int del; //삭제 상태 (0 정상 | 1 삭제됨)
-	public Blog_Reply(int blog_reply_no, String blog_no, String id, Date reply_date, String reply_content, int refer,
+	public Blog_Reply(int blog_reply_no, int blog_no, String id, Date reply_date, String reply_content, int refer,
 			int depth, int step, int del) {
 		super();
 		this.blog_reply_no = blog_reply_no;
@@ -33,10 +33,10 @@ public class Blog_Reply implements ReplyInterface{
 	public void setBlog_reply_no(int blog_reply_no) {
 		this.blog_reply_no = blog_reply_no;
 	}
-	public String getBlog_no() {
+	public int getBlog_no() {
 		return blog_no;
 	}
-	public void setBlog_no(String blog_no) {
+	public void setBlog_no(int blog_no) {
 		this.blog_no = blog_no;
 	}
 	public String getId() {

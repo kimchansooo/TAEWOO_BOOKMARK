@@ -8,7 +8,7 @@ public class Popup {
 	private String id;//작성자
 	private String popup_title;//팝업제목(관리용)
 	private String popup_filename;//팝업이미지(공지내용)
-	private Date popup_date;//기간
+	private Date popup_date;//기간 ~11.30
 	public Popup(int popup_no, String id, String popup_title, String popup_filename, Date popup_date) {
 		super();
 		this.popup_no = popup_no;
