@@ -1,5 +1,7 @@
 package kr.or.kosa.utils;
 
+import javax.naming.NamingException;
+
 import kr.or.kosa.dao.BlogDao;
 import kr.or.kosa.dao.BookDao;
 import kr.or.kosa.dao.BookMarkDao;
@@ -14,7 +16,11 @@ public class DaoFactory {
 		BookMarkDao dao = null;
 		
 		if(name.toLowerCase().equals("blog")) {
-			dao = new BlogDao();
+			try {
+				dao = new BlogDao();
+			} catch (NamingException e) {
+				e.printStackTrace();
+			}
 		} else if(name.toLowerCase().equals("book")) {
 			dao = new BookDao();
 		} else if(name.toLowerCase().equals("calendar")) {
