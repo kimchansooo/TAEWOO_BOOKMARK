@@ -103,7 +103,7 @@ public class QuestionDao implements BookMarkDao{
 		return list;
 	}
 	//(원본)글쓰기
-	public int questionBoardWrite(Question_Board board) {
+	public int writeQuestionBoard(Question_Board board) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		int row = 0;
@@ -160,7 +160,7 @@ public class QuestionDao implements BookMarkDao{
 		return refer_max;
 	}
 	//답글쓰기
-	public int QuestionRewrite(Question_Board board) {
+	public int rewriteQuestion(Question_Board board) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -227,7 +227,7 @@ public class QuestionDao implements BookMarkDao{
 	}
 	//글수정
 	// 제목, 내용, 날짜, 공지사항유무 업데이트
-	public int questionUpdate(Question_Board board) {
+	public int updateQuestion(Question_Board board) {
 		Connection conn = null;
 		PreparedStatement pstmt =null;
 		ResultSet rs = null;
@@ -252,7 +252,7 @@ public class QuestionDao implements BookMarkDao{
 		return row;
 	}
 	//글삭제
-	public boolean questionDelete(String questionNo) {
+	public boolean deleteQuestion(String questionNo) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		boolean result = false;
