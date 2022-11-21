@@ -100,7 +100,7 @@ public class UsersDao implements BookMarkDao{
 	}
 	//회원정보수정
 	//update users set pwd='...', nickname='....'
-	public boolean userUpdate(Users user) {
+	public boolean updateUser(Users user) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		boolean result = false;
@@ -151,7 +151,7 @@ public class UsersDao implements BookMarkDao{
 	}
 	//회원삭제
 	//delete from users where userid='';
-	public boolean userDelete(String id) {
+	public boolean deleteUser(String id) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		boolean result = false;
@@ -177,7 +177,7 @@ public class UsersDao implements BookMarkDao{
 	}
 	//회원전체리스트조회
 	//select * from users
-	public List<Users> userAllList(){
+	public List<Users> getUserAllList(){
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -214,7 +214,7 @@ public class UsersDao implements BookMarkDao{
 	}
 	//회원like조회
 	//select * from users where [type] like '[value]'
-	public List<Users> userLikeList(String type, String value){
+	public List<Users> getUserListByLike(String type, String value){
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -254,7 +254,7 @@ public class UsersDao implements BookMarkDao{
 	}
 	//회원 조회
 	//select * from users where id=[아이디]
-	public Users userById(String id){
+	public Users getUserById(String id){
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
