@@ -10,7 +10,7 @@ public class Calendar {
 	private Date calendar_end; //종료일
 	private String calendar_content; //일정 내용
 	private int calendar_status; //상태 (진행중 0 | 성공 1 | 실패 2)
-	Calendar(){}
+	public Calendar(){}
 	public Calendar(int calendar_no, String id, Date calendar_start, Date calendar_end, String calendar_content,
 			int calendar_status) {
 		super();
