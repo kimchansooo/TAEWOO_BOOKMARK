@@ -1,23 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-<<<<<<< HEAD
-        
-    <wb-module deploy-name="Team4_1031">
-                
-=======
-    <wb-module deploy-name="Team4_1031">
->>>>>>> 2519cde974c7529bc69e592a4d4d788af30ee83c
+
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
                 
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
-<<<<<<< HEAD
+
                 
         <property name="java-output-path" value="/Team4_1031/build/classes"/>
         <property name="context-root" value="TAEWOO_BOOKMARK"/>
             
-=======
+
         <property name="context-root" value="Team4_1031"/>
         <property name="java-output-path" value="/Team4_1031/build/classes"/>
->>>>>>> 2519cde974c7529bc69e592a4d4d788af30ee83c
+
     </wb-module>
     
 </project-modules>
