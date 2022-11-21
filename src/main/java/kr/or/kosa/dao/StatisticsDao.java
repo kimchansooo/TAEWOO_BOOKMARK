@@ -379,13 +379,13 @@ public class StatisticsDao implements BookMarkDao {
 		
 		try {
 			conn = ds.getConnection();
-			String sql = "select payment_date, sum(sumprice) as total"
-					+ " from book_payment group by payment_date";
+			String sql = "select substr(payment_date, 0, 10) as daily, sum(sumprice) as total "
+					+ "from book_payment group by substr(payment_date, 0, 10)";
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
 			
 			while(rs.next()) {
-				String date = rs.getString("payment_date"); //TODO: payment_date는 string인데 이렇게 해도 받아와지나?
+				String date = rs.getString("daily"); //TODO: payment_date는 string인데 이렇게 해도 받아와지나?
 				int total = rs.getInt("total");
 				
 				dailyarr.add(new Statistics(date, total));
@@ -406,10 +406,169 @@ public class StatisticsDao implements BookMarkDao {
 		return dailyarr;
 	}
 	
-	//TODO: 이 아래는 날짜 포맷이 정해지기 전까지 할 수가 없음...substr로 할 거라서...
+	//date_format='YYYY-MM-DD HH24:MI:SS';
 	//월별 매출 통계
+	public List<Statistics> monthlySales(){
+		List<Statistics> monthlyarr = new ArrayList<>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = ds.getConnection();
+			String sql = "select substr(payment_date, 0, 7) as monthly, sum(sumprice) as total "
+					+ "from book_payment group by substr(payment_date, 0, 7)";
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				String dummymonth = rs.getString("monthly");
+				int total = rs.getInt("total");
+				//month : 2022-11
+				String year = dummymonth.substring(0,4);
+				String month = dummymonth.substring(5);
+				
+				monthlyarr.add(new Statistics(year + "년 " + month + "월", total));
+				
+			}
+			
+		} catch (Exception e) {
+			System.out.println("monthlySales 예외 : " + e.getMessage());
+		} finally {
+			try {
+				rs.close();
+				pstmt.close();
+				conn.close();
+			} catch (Exception e2) {
+				
+			}
+		}
+		
+		return monthlyarr;
+	}
 	
-	//주별 매출 통계
+	//이번 주 매출 통계
+	public List<Statistics> curWeekSales(){
+		List<Statistics> curWeekarr = new ArrayList<>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = ds.getConnection();
+			String sql = "SELECT"
+					+ "to_char(TRUNC(payment_date, 'iw'),'YYYY.MM.DD')|| ' - ' || to_char(sysdate, 'YYYY.MM.DD') AS weekly,"
+					+ "    sum(sumprice) AS total "
+					+ "FROM book_payment "
+					+ "group by TRUNC(payment_date, 'iw') "
+					+ "having TRUNC(payment_date, 'iw') > sysdate - 7";
+			
+			pstmt = conn.prepareCall(sql);
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				String week = rs.getString("weekly");
+				int total = rs.getInt("total");
+				
+				curWeekarr.add(new Statistics(week, total));
+			}
+			
+		} catch (Exception e) {
+			System.out.println("curWeekSales 예외 : " + e.getMessage());
+		} finally {
+			try {
+				rs.close();
+				pstmt.close();
+				conn.close();	
+			} catch (Exception e2) {
+
+			}
+		}
+		
+		return curWeekarr;
+	}
 	
-	//연별 매출 통계
+	
+	//연간 매출 통계 ....
+	public List<Statistics> yearlySales(){
+		List<Statistics> yearlyarr = new ArrayList<>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = ds.getConnection();
+			String sql = "select substr(payment_date, 0,4) as yearly, sum(sumprice) as total "
+					+ "from book_payment group by substr(payment_date, 0, 4)";
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				String year = rs.getString("yearly");
+				int total = rs.getInt("total");
+				
+				yearlyarr.add(new Statistics(year, total));
+				
+			}
+			
+		} catch (Exception e) {
+			System.out.println("yearlySales 예외 : " + e.getMessage());
+		} finally {
+			try {
+				rs.close();
+				pstmt.close();
+				conn.close();
+			} catch (Exception e2) {
+				
+			}
+		}
+		
+		return yearlyarr;
+	}
+	
+	//검색 기간 매출 조회
+	public List<Statistics> searchList(String date1, String date2){ //TODO : 파라미터 date? string?
+		List<Statistics> searchArr = new ArrayList<>();
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = ds.getConnection();
+			String sql = "select sumprice "
+					+ "from book_payment "
+					+ "where payment_date"
+					+ " between to_date(?, 'YYYY-MM-DD') and to_date(?, 'YYYY-MM-DD') +1";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, date1);
+			pstmt.setString(2, date2);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()){
+
+				do{
+					//결과 있을 때 내용...
+					int total = rs.getInt("sumprice"); 
+					searchArr.add(new Statistics("조회 결과", total));
+					
+				}while(rs.next());
+				}else{
+					// TODO: 결과 없을 때 내용..
+					System.out.println("검색 결과 없음");
+					
+
+				}
+			
+		} catch (Exception e) {
+			System.out.println("searchList 예외 : " + e.getMessage());
+		}
+		
+		return searchArr;
+	}
+	
 }
