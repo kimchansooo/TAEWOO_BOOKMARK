@@ -40,7 +40,7 @@ public class CalendarAddService implements Action {
 			calendar.setCalendar_content(calendar_content);
 			calendar.setCalendar_start(formatter.dateParser(calendar_start));
 			calendar.setCalendar_end(formatter.dateParser(calendar_end));
-			//근데 status는 기본적으로 0으로 만들어지지 않나? default없나??
+			//TODO:근데 status는 기본적으로 0으로 만들어지지 않나? default없나??
 			calendar.setCalendar_status(0);
 			
 			int result = dao.CalendarAdd(calendar);
