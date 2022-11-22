@@ -220,6 +220,8 @@ public class UsersDao implements BookMarkDao{
 		}
 		return list;
 	}
+	//회원카운트
+	
 	//회원like조회
 	//select * from users where [type] like '[value]'
 	public List<Users> getUserListByLike(String type, String value){
