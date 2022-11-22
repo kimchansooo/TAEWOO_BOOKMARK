@@ -33,7 +33,7 @@ public class BookMarkController extends HttpServlet {
     	//=================================================================//
     	 if(url_Command.equals("")) { //0. 메인 페이지 이동
      		// 이동+처리
-     		action = null;
+     		action = null;                                                
      		forward = action.execute(request, response);
     	//=================================================================//
     	//                                                     문의사항

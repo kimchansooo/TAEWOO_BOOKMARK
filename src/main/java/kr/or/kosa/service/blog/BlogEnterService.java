@@ -14,15 +14,14 @@ import kr.or.kosa.dto.Blog_Board;
 import kr.or.kosa.utils.DaoFactory;
 
 public class BlogEnterService implements Action {
-//블로그 들어가는 서비스
-//파라미터로 이동할 블로그(blogid)를 받는다.
+//회원 - 회원 블로그 페이지 보기
 	@Override
 	public ActionForward execute(HttpServletRequest request, HttpServletResponse response) {
 		ActionForward forward = new ActionForward();
 		
 		try {
 			BlogDao dao = new BlogDao();
-			String blogid = request.getParameter("blogid");
+			String blogid = request.getParameter("id");
 			List<Blog_Board> list = dao.getBoardListById(blogid);
 			
 			request.setAttribute("id", blogid);
