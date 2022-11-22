@@ -1,5 +1,13 @@
 package kr.or.kosa.service.payment;
 
+import java.io.IOException;
+import java.net.URI;
+//import java.net.URI;
+//import java.net.http.HttpClient;
+//import java.net.http.HttpRequest;
+//import java.net.http.HttpResponse;
+import java.net.http.HttpClient;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,7 +19,24 @@ public class PaymentService implements Action {
 	@Override
 	public ActionForward execute(HttpServletRequest request, HttpServletResponse response) {
 		ActionForward forward = new ActionForward();
-		
+//		HttpServletRequest request = HttpServletRequest.newBuilder()
+//			    .uri(URI.create("https://api.tosspayments.com/v1/payments/confirm"))
+//			    .header("Authorization", "Basic dGVzdF9za196WExrS0V5cE5BcldtbzUwblgzbG1lYXhZRzVSOg==")
+//			    .header("Content-Type", "application/json")
+//			    .method("POST", HttpServletRequest.BodyPublishers.ofString("{\"paymentKey\":\"ovokXHUy6edshVMvA2B7E\",\"amount\":15000,\"orderId\":\"l4r-wMvhCF9v2pJigVJcZ\"}"))
+//			    .build();
+//			HttpServletResponse<String> response = HttpClient.newHttpClient().send(request, HttpServletResponse.BodyHandlers.ofString());
+//			try {
+//				response = HttpClient.newHttpClient().send(request, HttpServletResponse.BodyHandlers.ofString());
+//			} catch (IOException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			} catch (InterruptedException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
+//			System.out.println(response.body());
+//		
 		try {
 			
 		} catch (Exception e) {

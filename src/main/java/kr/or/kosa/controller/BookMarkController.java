@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import kr.or.kosa.action.Action;
 import kr.or.kosa.action.ActionForward;
+import kr.or.kosa.service.calendar.CalendarAllListService;
 
 @WebServlet("*.do")
 public class BookMarkController extends HttpServlet {
@@ -32,7 +33,7 @@ public class BookMarkController extends HttpServlet {
     	//=================================================================//
     	 if(url_Command.equals("")) { //0. 메인 페이지 이동
      		// 이동+처리
-     		action = null;
+     		action = null;                                                
      		forward = action.execute(request, response);
     	//=================================================================//
     	//                                                     문의사항
@@ -337,9 +338,10 @@ public class BookMarkController extends HttpServlet {
      	//=================================================================//
      	//                                                     일정관리 - 관리자 전용
      	//=================================================================//
-    	else if(url_Command.equals("")) { //70 일정관리 전체 페이지 이동 (관리자페이지)
+    	else if(url_Command.equals("/calendarall.do")) { //70 일정관리 전체 페이지 이동 (관리자페이지)
     		// 이동+처리
-    		action = null;
+    		System.out.println("calendarall.do 분기 진입");
+    		action = new CalendarAllListService();
     		forward = action.execute(request, response);
     	} else if(url_Command.equals("")) { //71 일정관리 검색
     		// 비동기

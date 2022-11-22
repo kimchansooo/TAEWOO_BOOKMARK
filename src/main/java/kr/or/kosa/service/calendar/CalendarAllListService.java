@@ -36,7 +36,7 @@ public class CalendarAllListService implements Action {
 		
 		//TODO:뷰 설정하기
 		forward.setRedirect(false);
-		forward.setPath(null);
+		forward.setPath("/WEB-INF/views/calendarpage/calendarMain.jsp");
 		
 		return forward;
 	}

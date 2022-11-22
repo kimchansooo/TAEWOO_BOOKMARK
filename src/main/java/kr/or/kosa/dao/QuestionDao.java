@@ -55,6 +55,26 @@ public class QuestionDao implements BookMarkDao{
 		}
 		return list;
 	}
+	//게시물 총 건수 구하기
+		public int totalBoardCount() {
+			Connection conn = null;
+			PreparedStatement pstmt = null;
+			ResultSet rs = null;
+			int totalcount = 0;
+			try {
+				conn = ConnectionHelper.getConnection("oracle"); //연결객체
+				String sql = "select count(*) as cnt from question_board";
+				pstmt = conn.prepareStatement(sql);
+				rs = pstmt.executeQuery();
+				if(rs.next()) {
+					totalcount = rs.getInt("cnt");
+				}
+			} catch (Exception e) {
+				System.out.println("totalBoardCount 예외 : " + e.getMessage());
+			}
+			return totalcount;
+		}
+	
 	//글 like 조회
 	//select * from question_board where [type] like [value];
 	public List<Question_Board> getQuestionLikeList(String type, String value,int cpage , int pagesize){
@@ -102,6 +122,27 @@ public class QuestionDao implements BookMarkDao{
 		}
 		return list;
 	}
+	//검색한 게시물 총 건수 구하기
+			public int totalBoardCountByLike(String type, String value) {
+				Connection conn = null;
+				PreparedStatement pstmt = null;
+				ResultSet rs = null;
+				int totalcount = 0;
+				try {
+					conn = ConnectionHelper.getConnection("oracle"); //연결객체
+					String sql = "select count(*) as cnt from question_board where ? like ?";
+					pstmt = conn.prepareStatement(sql);
+					pstmt.setString(1, type);
+					pstmt.setString(2, value);
+					rs = pstmt.executeQuery();
+					if(rs.next()) {
+						totalcount = rs.getInt("cnt");
+					}
+				} catch (Exception e) {
+					System.out.println("totalBoardCount 예외 : " + e.getMessage());
+				}
+				return totalcount;
+			}
 	//(원본)글쓰기
 	public int writeQuestionBoard(Question_Board board) {
 		Connection conn = null;
@@ -252,7 +293,7 @@ public class QuestionDao implements BookMarkDao{
 		return row;
 	}
 	//글삭제
-	public boolean deleteQuestion(String questionNo) {
+	public boolean deleteQuestion(String question_no) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		boolean result = false;
@@ -260,7 +301,7 @@ public class QuestionDao implements BookMarkDao{
 			conn = ConnectionHelper.getConnection("oracle");
 			String sql="delete from question_board where question_no=?";
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, questionNo);
+			pstmt.setString(1, question_no);
 			
 			int row = pstmt.executeUpdate();
 			

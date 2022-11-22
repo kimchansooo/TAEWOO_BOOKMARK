@@ -5,15 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
 import kr.or.kosa.dto.Statistics;
+import kr.or.kosa.utils.ConnectionHelper;
 
 public class StatisticsDao implements BookMarkDao {
 
@@ -80,24 +75,25 @@ public class StatisticsDao implements BookMarkDao {
 //				ID
 //			);
 	
-	DataSource ds = null;
-	
+	Connection conn;
+	PreparedStatement pstmt;
+	ResultSet rs;
+	String sql;
+
 	public StatisticsDao(){
 		try {
-			Context context = new InitialContext();
-			ds = (DataSource)context.lookup("java:comp/env/jdbc/oracle");
+			conn = ConnectionHelper.getConnection("orcle");
+			pstmt = null;
+			rs = null;
+			sql = "";
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
 	//남녀 성비 통계
 	public Statistics genderStatistics(String gender) {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
+
 		Statistics femaleStatistics = null;
 		Statistics maleStatistics = null;
 		//주민번호 예 : 9802112******
@@ -110,7 +106,6 @@ public class StatisticsDao implements BookMarkDao {
 		int female = 0;
 		
 		try {
-			conn = ds.getConnection();
 			String sql = "select substr(regist_no, -1) as num from user_detail";
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
@@ -134,11 +129,10 @@ public class StatisticsDao implements BookMarkDao {
 			System.out.println("genderStatics 예외 : " + e.getMessage());
 		}finally {
 			try {
-				pstmt.close();
-				rs.close();
-				conn.close();
+				ConnectionHelper.close(rs);
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
-				// TODO: handle exception
 			}
 		}
 		
@@ -156,10 +150,6 @@ public class StatisticsDao implements BookMarkDao {
 		List<Statistics> genderArr = new ArrayList<>();
 		List<String> gender = new ArrayList<>();
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
 		Statistics femaleStatistics = null;
 		Statistics maleStatistics = null;
 
@@ -167,7 +157,6 @@ public class StatisticsDao implements BookMarkDao {
 		int female = 0;
 		
 		try {
-			conn = ds.getConnection();
 			String sql = "select substr(regist_no, -1) as num from user_detail";
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
@@ -193,17 +182,16 @@ public class StatisticsDao implements BookMarkDao {
 			System.out.println("getGender 예외 : " + e.getMessage());
 		}finally {
 			try {
-				pstmt.close();
-				rs.close();
-				conn.close();
+				ConnectionHelper.close(rs);
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
-				// TODO: handle exception
 			}
 		}
 		
 		return genderArr;
 	}
-	
+	/*
 	 private int getAge(int birthYear, int birthMonth, int birthDay)
 	 {
 	         Calendar current = Calendar.getInstance();
@@ -321,17 +309,13 @@ public class StatisticsDao implements BookMarkDao {
 		
 		return ageArr;
 	}
+	*/
 	
 	//연령 통계 쿼리로
 	public List<Statistics> getAgeQuery(){
 		List<Statistics> ageArr = new ArrayList<>();
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
+
 		try {
-			conn = ds.getConnection();
 			String sql = "select 세대, count(세대) as count from (select "
 					+ "case when y between 0 and 10 then 0 "
 					+ "when y between 11 and 20 then 10 "
@@ -356,10 +340,10 @@ public class StatisticsDao implements BookMarkDao {
 			System.out.println("getAgeQuery 예외 : " + e.getMessage());
 		} finally {
 			try {
-				rs.close();
-				pstmt.close();
-				conn.close();
-			} catch (SQLException e) {
+				ConnectionHelper.close(rs);
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			
@@ -373,12 +357,7 @@ public class StatisticsDao implements BookMarkDao {
 		
 		List<Statistics> dailyarr = new ArrayList<>();
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
 		try {
-			conn = ds.getConnection();
 			String sql = "select substr(payment_date, 0, 10) as daily, sum(sumprice) as total "
 					+ "from book_payment group by substr(payment_date, 0, 10)";
 			pstmt = conn.prepareStatement(sql);
@@ -395,9 +374,9 @@ public class StatisticsDao implements BookMarkDao {
 			System.out.println("dailySales 예외 : " + e.getMessage());
 		} finally {
 			try {
-				rs.close();
-				pstmt.close();
-				conn.close();
+				ConnectionHelper.close(rs);
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
 
 			}
@@ -411,12 +390,7 @@ public class StatisticsDao implements BookMarkDao {
 	public List<Statistics> monthlySales(){
 		List<Statistics> monthlyarr = new ArrayList<>();
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
 		try {
-			conn = ds.getConnection();
 			String sql = "select substr(payment_date, 0, 7) as monthly, sum(sumprice) as total "
 					+ "from book_payment group by substr(payment_date, 0, 7)";
 			pstmt = conn.prepareStatement(sql);
@@ -437,9 +411,9 @@ public class StatisticsDao implements BookMarkDao {
 			System.out.println("monthlySales 예외 : " + e.getMessage());
 		} finally {
 			try {
-				rs.close();
-				pstmt.close();
-				conn.close();
+				ConnectionHelper.close(rs);
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
 				
 			}
@@ -451,13 +425,8 @@ public class StatisticsDao implements BookMarkDao {
 	//이번 주 매출 통계
 	public List<Statistics> curWeekSales(){
 		List<Statistics> curWeekarr = new ArrayList<>();
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
+
 		try {
-			conn = ds.getConnection();
 			String sql = "SELECT"
 					+ "to_char(TRUNC(payment_date, 'iw'),'YYYY.MM.DD')|| ' - ' || to_char(sysdate, 'YYYY.MM.DD') AS weekly,"
 					+ "    sum(sumprice) AS total "
@@ -479,9 +448,9 @@ public class StatisticsDao implements BookMarkDao {
 			System.out.println("curWeekSales 예외 : " + e.getMessage());
 		} finally {
 			try {
-				rs.close();
-				pstmt.close();
-				conn.close();	
+				ConnectionHelper.close(rs);
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
 
 			}
@@ -495,12 +464,7 @@ public class StatisticsDao implements BookMarkDao {
 	public List<Statistics> yearlySales(){
 		List<Statistics> yearlyarr = new ArrayList<>();
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
 		try {
-			conn = ds.getConnection();
 			String sql = "select substr(payment_date, 0,4) as yearly, sum(sumprice) as total "
 					+ "from book_payment group by substr(payment_date, 0, 4)";
 			pstmt = conn.prepareStatement(sql);
@@ -518,9 +482,9 @@ public class StatisticsDao implements BookMarkDao {
 			System.out.println("yearlySales 예외 : " + e.getMessage());
 		} finally {
 			try {
-				rs.close();
-				pstmt.close();
-				conn.close();
+				ConnectionHelper.close(rs);
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
 				
 			}
@@ -533,12 +497,7 @@ public class StatisticsDao implements BookMarkDao {
 	public List<Statistics> searchList(String date1, String date2){ //TODO : 파라미터 date? string?
 		List<Statistics> searchArr = new ArrayList<>();
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
 		try {
-			conn = ds.getConnection();
 			String sql = "select sumprice "
 					+ "from book_payment "
 					+ "where payment_date"
@@ -566,6 +525,10 @@ public class StatisticsDao implements BookMarkDao {
 			
 		} catch (Exception e) {
 			System.out.println("searchList 예외 : " + e.getMessage());
+		} finally {
+			ConnectionHelper.close(rs);
+			ConnectionHelper.close(pstmt);
+			ConnectionHelper.close(conn);
 		}
 		
 		return searchArr;

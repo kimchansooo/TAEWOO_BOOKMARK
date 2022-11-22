@@ -7,8 +7,8 @@ import kr.or.kosa.action.Action;
 import kr.or.kosa.action.ActionForward;
 import kr.or.kosa.dao.BlogDao;
 
-public class BlogDeleteService implements Action {
-//회원 - 블로그 게시글 삭제 처리
+public class BlogAdminDeleteService implements Action {
+	 //24. 관리자 - 블로그 게시글 삭제 처리
 	@Override
 	public ActionForward execute(HttpServletRequest request, HttpServletResponse response) {
 		ActionForward forward = new ActionForward();
@@ -25,11 +25,11 @@ public class BlogDeleteService implements Action {
 			} else {
 				msg = "게시글 삭제를 실패했습니다.";
 			}
-			path = "blog.do?blogid=" + request.getParameter("blogid");
+			path = "adminblog.do?blogid=" + request.getParameter("blogid");
 		} catch (Exception e) {
 			e.printStackTrace();
 			msg  = "서버 오류 발생";
-			path = "blog.do?blogid=" + request.getParameter("blogid");
+			path = "adminblog.do?blogid=" + request.getParameter("blogid");
 		} 
 		//팝업 보여주고 다른 페이지로
 		request.setAttribute("msg",msg);
