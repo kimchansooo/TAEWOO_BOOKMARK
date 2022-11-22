@@ -1,39 +1,37 @@
 package kr.or.kosa.service.blog;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import kr.or.kosa.action.Action;
 import kr.or.kosa.action.ActionForward;
 import kr.or.kosa.dao.BlogDao;
-import kr.or.kosa.dao.BookMarkDao;
 import kr.or.kosa.dto.Blog_Board;
-import kr.or.kosa.utils.DaoFactory;
 
-public class BlogAllListService implements Action {
-//관리자 - 블로그 게시글 전체조회
+public class BlogAdminEdit implements Action {
+ //22.  관리자 - 블로그 게시글 수정 페이지 이동
 	@Override
 	public ActionForward execute(HttpServletRequest request, HttpServletResponse response) {
 		ActionForward forward = new ActionForward();
 		
 		try {
 			BlogDao dao = new BlogDao();
-			List<Blog_Board> list = dao.AllBoard();
+			int blog_no = Integer.parseInt(request.getParameter("blog_no"));
+			Blog_Board board = dao.getContent(blog_no);
 			
-			request.setAttribute("blogboardlist", list);
+			request.setAttribute("content", board);
 			
-			forward.setPath("관리자블로그게시글조회.do");
+			forward.setPath("adminblogedit.jsp");
 			forward.setRedirect(false);
 		} catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("msg", "에러가 발생했습니다.");
-			request.setAttribute("url", "main.do");
+			String msg  = "서버 오류 발생";
+			String path = "main.do";
+			request.setAttribute("msg", msg);
+			request.setAttribute("path", path);
 			forward.setPath("redirect.jsp");
-			forward.setRedirect(true);
-		}
+			forward.setRedirect(false);
+		} 
 		return forward;
 	}
 

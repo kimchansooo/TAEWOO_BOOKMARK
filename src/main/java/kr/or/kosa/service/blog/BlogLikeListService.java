@@ -11,8 +11,7 @@ import kr.or.kosa.dao.BlogDao;
 import kr.or.kosa.dto.Blog_Board;
 
 public class BlogLikeListService implements Action {
-//아이디 like 조회 리스트 -> 관리자 페이지로 
-//아마 비동기로 바꿀듯
+//관리자 - 블로그 게시글 like 조회
 	@Override
 	public ActionForward execute(HttpServletRequest request, HttpServletResponse response) {
 		ActionForward forward = new ActionForward();
@@ -20,7 +19,7 @@ public class BlogLikeListService implements Action {
 		try {
 			BlogDao dao = new BlogDao();
 			
-			List<Blog_Board> list = dao.getBoardListById(request.getParameter("blogid"));
+			List<Blog_Board> list = dao.getBoardListById(request.getParameter("id"));
 			
 			request.setAttribute("blogboardlist", list);
 			
