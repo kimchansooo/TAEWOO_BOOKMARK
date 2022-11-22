@@ -22,7 +22,7 @@ public class BlogAllListService implements Action {
 		try {
 			BlogDao dao = new BlogDao();
 			List<Blog_Board> list = dao.AllBoard();
-			
+			System.out.println(list);
 			request.setAttribute("blogboardlist", list);
 			
 			forward.setPath("관리자블로그게시글조회.do");
