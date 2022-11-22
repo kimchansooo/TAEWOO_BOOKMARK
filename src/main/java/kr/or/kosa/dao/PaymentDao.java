@@ -154,19 +154,28 @@ public class PaymentDao implements BookMarkDao{
 			return paymentlist;
 		} 
 		//전체 결제 목록
-		public List<Book_Payment> allpaymentlist(){
+		public List<Book_Payment> allpaymentlist(int cpage , int pagesize){
 			Connection conn = ConnectionHelper.getConnection("oracle");
 			PreparedStatement pstmt = null;
 			ResultSet rs = null;
 			
-			List<Book_Payment> allpaymentlist = null;
+			List<Book_Payment> allpaymentlist = new ArrayList<Book_Payment>();
 			
 			try {
-				String sql = "Select payment_no,isbn,count,payment_date,sumprice from book_payment";
+				String sql = "select * from"
+						+ "    (select rownum rn,payment_no, isbn, count,payment_date,sumprice"
+						+ "    from"
+						+ "        ( SELECT * FROM book_payment ORDER BY payment_no asc )"
+						+ "    where rownum <= ?) where rn >= ?";
 				pstmt = conn.prepareStatement(sql);
 				
+				int start = cpage * pagesize - (pagesize -1); //1 * 5 - (5 - 1) >> 1
+				int end = cpage * pagesize; // 1 * 5 >> 5
+				
+				pstmt.setInt(1, end);
+				pstmt.setInt(2, start);
 				rs = pstmt.executeQuery();
-				allpaymentlist = new ArrayList<Book_Payment>();
+				
 				
 				while(rs.next()) {
 					Book_Payment bookpayment = new Book_Payment();
