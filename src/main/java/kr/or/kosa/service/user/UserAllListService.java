@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import kr.or.kosa.action.Action;
 import kr.or.kosa.action.ActionForward;
 import kr.or.kosa.dao.UsersDao;
-import kr.or.kosa.dto.Board;
-import kr.or.kosa.dto.Users;
 
 public class UserAllListService implements Action {
 

@@ -29,9 +29,15 @@
 	<div id='calendar'></div>
 	<div class='hide calendarPopup' id="test">
 		<div style="padding:5px">
+<<<<<<< HEAD
+			<p>title:<input type="text" id="title" name="calendar_content"></p>
+			<p>start:<input type="date" id="startdate" name="calendar_start"></p>
+			<p>end:<input type="date" id="enddate" name="calendar_end"></p>
+=======
 			<p>title:<input type="text" id="title"></p>
 			<p>start:<input type="date" id="startdate"></p>
 			<p>end:<input type="date" id="enddate"></p>
+>>>>>>> bfe324407f72000cb800dd4bd6ca0d74da1616b0
 			<p><button id="popupbutton">추가하기</button></p>
 		</div>
 	</div>
