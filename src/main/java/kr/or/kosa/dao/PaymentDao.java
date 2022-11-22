@@ -22,7 +22,7 @@ public class PaymentDao implements BookMarkDao{
 			Connection conn = ConnectionHelper.getConnection("oracle");
 			PreparedStatement pstmt = null;
 			ResultSet rs = null;
-			
+			//클래스 테스트
 			List<Book> cartlist = null;
 			
 			try {
