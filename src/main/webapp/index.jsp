@@ -8,5 +8,6 @@
 </head>
 <body>
 		<h3>test</h3>
+			<a href="${pageContext.request.contextPath}/calendarall.do">DEMO WEBSITE</a>
 </body>
 </html>

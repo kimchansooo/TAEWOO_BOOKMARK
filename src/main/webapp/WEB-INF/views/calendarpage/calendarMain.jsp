@@ -38,8 +38,8 @@
 </body>
 <script type="text/javascript">
 	document.addEventListener('DOMContentLoaded', function() {
-		var calendarEl = document.getElementById('calendar');
-		var calendarOption = {
+		let calendarEl = document.getElementById('calendar');
+		let calendarOption = {
 				initialView : 'dayGridMonth', // 초기 로드 될때 보이는 캘린더 화면(기본 설정: 달)
 				headerToolbar : { // 헤더에 표시할 툴 바
 					start : 'prev next today',
