@@ -16,11 +16,7 @@ public class DaoFactory {
 		BookMarkDao dao = null;
 		
 		if(name.toLowerCase().equals("blog")) {
-			try {
 				dao = new BlogDao();
-			} catch (NamingException e) {
-				e.printStackTrace();
-			}
 		} else if(name.toLowerCase().equals("book")) {
 			dao = new BookDao();
 		} else if(name.toLowerCase().equals("calendar")) {

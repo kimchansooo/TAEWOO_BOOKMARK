@@ -177,18 +177,26 @@ public class UsersDao implements BookMarkDao{
 	}
 	//회원전체리스트조회
 	//select * from users
-	public List<Users> getUserAllList(){
+	public List<Users> getUserAllList(int cpage , int pagesize){
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		List<Users> list = new ArrayList<Users>();
 		try {
 			conn = ConnectionHelper.getConnection("oracle");
-			String sql = "select "
-					+ "u.id, u.password, u.name, u.state, d.addr, "
-					+ "d.detail_addr, d.regist_no, d.phone "
-					+ "from users u left join user_detail d on u.id = d.id";
+			String sql = "select  rn, id, password, name, state, addr, detail_addr, regist_no, phone from"
+					+ " (select rownum rn, u.id, u.password, u.name, u.state, d.addr, d.detail_addr, d.regist_no, d.phone"
+						+ " from users u left join user_detail d on u.id = d.id"
+						+ " where rownum <= ?)"
+					+ " where rn > ?";
+			
+			int start = cpage * pagesize - (pagesize -1); //1 * 5 - (5 - 1) >> 1
+			int end = cpage * pagesize; // 1 * 5 >> 5
+			
 			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, end);
+			pstmt.setInt(2, start);
+			
 			rs = pstmt.executeQuery();
 			
 			while(rs.next()) {
