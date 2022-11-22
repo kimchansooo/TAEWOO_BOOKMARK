@@ -16,27 +16,35 @@ import javax.sql.DataSource;
 
 import kr.or.kosa.dto.Blog_Board;
 import kr.or.kosa.dto.Blog_Reply;
+import kr.or.kosa.utils.ConnectionHelper;
 
 public class BlogDao implements BookMarkDao{
 
 	//TODO : autoCommit 어떻게 해야되는지?
 	//TODO : 시퀀스 사용 제대로 되는지 확인
 	
-	DataSource ds = null;
 	
-	public BlogDao() throws NamingException {
-		Context context = new InitialContext();
-		ds = (DataSource)context.lookup("java:comp/env/jdbc/oracle");
+	Connection conn;
+	PreparedStatement pstmt;
+	ResultSet rs;
+	String sql;
+
+	
+	public BlogDao() {
+		try {
+			conn = ConnectionHelper.getConnection("orcle");
+			pstmt = null;
+			rs = null;
+			sql = "";
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	//블로그 글 전체 불러오기
 	public List<Blog_Board> AllBoard(){//int cpage , int pagesize){
 		List<Blog_Board> boardList = null;
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
 		try {
-			conn = ds.getConnection();
 			String sql=  "select a.blog_no, a.id, a.blog_title, a.blog_content, a.hits, a.blog_date, b.file_name "
 					+ "from blog_board a left join blogfile b "
 					+ "on a.blog_no = b.blog_no ";
@@ -65,12 +73,15 @@ public class BlogDao implements BookMarkDao{
 			}
 			
 		}catch (Exception e) {
-			System.out.println("AllBoard 오류 : " + e.getMessage());
+			System.out.println("AllBoard 예외 : " + e.getMessage());
 		}finally {
 			try {
-				pstmt.close();
-				rs.close();
-				conn.close();
+				ConnectionHelper.close(rs);
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
+//				pstmt.close();
+//				rs.close();
+//				conn.close();
 			} catch (Exception e2) {
 				System.out.println(e2.getMessage());
 			}
@@ -82,11 +93,8 @@ public class BlogDao implements BookMarkDao{
 	//특정 아이디의 블로그 게시글 전체 조회 추가 김태우 (11.21)//블로그 글 전체 불러오기
 	public List<Blog_Board> getBoardListById(String id){//int cpage , int pagesize){
 		List<Blog_Board> boardList = null;
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
+
 		try {
-			conn = ds.getConnection();
 			String sql=  "select a.blog_no, a.id, a.blog_title, a.blog_content, a.hits, a.blog_date, b.file_name "
 					+ "from blog_board a left join blogfile b "
 					+ "on a.blog_no = b.blog_no where a.id = ?";
@@ -116,12 +124,12 @@ public class BlogDao implements BookMarkDao{
 			}
 			
 		}catch (Exception e) {
-			System.out.println("AllBoard 오류 : " + e.getMessage());
+			System.out.println("AllBoard 예외 : " + e.getMessage());
 		}finally {
 			try {
-				pstmt.close();
-				rs.close();
-				conn.close();
+				ConnectionHelper.close(rs);
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
 				System.out.println(e2.getMessage());
 			}
@@ -132,12 +140,9 @@ public class BlogDao implements BookMarkDao{
 	
 	//게시물 총 건수 구하기
 	public int totalBoardCount() {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
+
 		int totalcount = 0;
 		try {
-			conn = ds.getConnection(); //연결객체
 			String sql = "select count(*) as cnt from blog_board";
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
@@ -146,6 +151,10 @@ public class BlogDao implements BookMarkDao{
 			}
 		} catch (Exception e) {
 			System.out.println("totalBoardCount 예외 : " + e.getMessage());
+		}finally {
+			ConnectionHelper.close(rs);
+			ConnectionHelper.close(pstmt);
+			ConnectionHelper.close(conn);
 		}
 		return totalcount;
 	}
@@ -154,13 +163,10 @@ public class BlogDao implements BookMarkDao{
 	//블로그 특정 글 조회
 	//파일이 있을 경우 조인해서...
 	public Blog_Board getContent(int blog_no) {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
+
 		Blog_Board board = null;
 		
 		try {
-			conn = ds.getConnection();
 			String sql = "select a.blog_no, a.id, a.blog_title, a.blog_content, a.hits, a.blog_date, b.file_name "
 					+ "from blog_board a left join blogfile b "
 					+ "on a.blog_no = b.blog_no "
@@ -184,9 +190,9 @@ public class BlogDao implements BookMarkDao{
 			System.out.println("getContent 예외 : " + e.getMessage());
 		}finally {
 			try {
-				pstmt.close();
-				rs.close();
-				conn.close(); //반환하기
+				ConnectionHelper.close(rs);
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
 				// TODO: handle exception
 			}
@@ -198,11 +204,7 @@ public class BlogDao implements BookMarkDao{
 	public boolean upHits(int blog_no) {
 		boolean result = false;
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		
 		try {
-			conn = ds.getConnection();
 			String sql = "update blog_board set hits = hits + 1"
 					+ " where blog_no = ?";
 			pstmt = conn.prepareStatement(sql);
@@ -217,8 +219,8 @@ public class BlogDao implements BookMarkDao{
 			System.out.println("upHits 예외 : " + e.getMessage());
 		}finally {
 			try {
-				pstmt.close();
-				conn.close();
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
 				
 			}
@@ -229,12 +231,10 @@ public class BlogDao implements BookMarkDao{
 	
 	//글 작성
 	public int writeok(Blog_Board board) {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
+
 		int row = 0;
 		
 		try {
-			conn = ds.getConnection();
 			String boardsql = "insert into"
 					+ " blog_board(blog_no, id, blog_title, blog_content, hits)"
 					+ " values(blog_no_seq.nextval,?,?,?,?)";
@@ -263,8 +263,8 @@ public class BlogDao implements BookMarkDao{
 			System.out.println("writeok 예외 : " + e.getMessage());
 		}finally {
 			try {
-				pstmt.close();
-				conn.close();
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
 				// TODO: handle exception
 			}
@@ -282,11 +282,7 @@ public class BlogDao implements BookMarkDao{
 		String blog_title = board.getParameter("blog_title");
 		String blog_content = board.getParameter("blog_content");
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		
 		try {
-			conn = ds.getConnection();
 			String sql = "update blog_board set blog_title=?, blog_content=? "
 					+ "where blog_no=?";
 			pstmt = conn.prepareStatement(sql);
@@ -299,8 +295,8 @@ public class BlogDao implements BookMarkDao{
 			System.out.println("blogEdit 예외 : " + e.getMessage());
 		}finally {
 			try {
-				pstmt.close();
-				conn.close();
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
 				// TODO: handle exception
 			}
@@ -313,17 +309,16 @@ public class BlogDao implements BookMarkDao{
 	public int deleteOk(int blog_no) {
 		int row = 0;
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		
 		try {
-			conn = ds.getConnection();
 			String sql = "delete from blog_board where blog_no = ?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, blog_no);
 			row = pstmt.executeUpdate();
 		} catch (Exception e) {
 			System.out.println("deleteOk 예외 : " + e.getMessage());
+		}finally {
+			ConnectionHelper.close(pstmt);
+			ConnectionHelper.close(conn);
 		}
 		
 		return row;
@@ -331,13 +326,10 @@ public class BlogDao implements BookMarkDao{
 	
 	//특정 글 댓글 불러오기
 	public List<Blog_Reply> getReply(int blog_no) {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
+
 		ArrayList<Blog_Reply> replylist = null;
 		
 		try {
-			conn = ds.getConnection();
 			String sql = "select blog_reply_no, id, refer, depth, step, reply_date, reply_content, del "
 					+ "from blog_reply where blog_no = ?";
 			
@@ -367,9 +359,9 @@ public class BlogDao implements BookMarkDao{
 			System.out.println("getReply 예외 : " + e.getMessage());
 		}finally {
 			try {
-				pstmt.close();
-				rs.close();
-				conn.close();
+				ConnectionHelper.close(rs);
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
 				
 			}
@@ -380,15 +372,13 @@ public class BlogDao implements BookMarkDao{
 	
 	//댓글 작성
 	public int replyWrite(int blog_reply_no, int blog_no, String id, String content){
-		Connection conn = null;
-		PreparedStatement pstmt = null;
+
 		int resultrow = 0;
 		int maxrefer = getMaxRefer();
 		int refer = maxrefer + 1;
 		//blog_reply_no를 지금은 받아주고 나중엔 안받아줘도 된다 ? ?
 		//원댓글 쓸 땐 blog_reply_no = refer
 		try {
-			conn = ds.getConnection();
 			String sql = "insert into blog_reply(blog_reply_no, blog_no, id, refer, reply_content, del)"
 					+ " values(blog_reply_no_seq.nextval,?,?,?,?)";
 			//blog__reply_no_ 에 seq 추가 (11.21 김태우)
@@ -407,8 +397,8 @@ public class BlogDao implements BookMarkDao{
 			System.out.println("replyWrite 예외 : " + e.getMessage());
 		}finally {
 			try {
-				pstmt.close();
-				conn.close();
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
 				
 			}
@@ -419,13 +409,10 @@ public class BlogDao implements BookMarkDao{
 	
 	//TODO : 댓글 refer 값 생성하기 ?
 	private int getMaxRefer() {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
+
 		int refer_max = 0;
 		
 		try {
-			conn = ds.getConnection();
 			String sql = "select nvl(max(refer), 0) from blog_reply";
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
@@ -436,9 +423,9 @@ public class BlogDao implements BookMarkDao{
 			System.out.println("getMaxRefer 예외 : " + e.getMessage());
 		}finally {
 			try {
-				pstmt.close();
-				rs.close();
-				conn.close();
+				ConnectionHelper.close(rs);
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			}catch (Exception e) {
 				
 			}
@@ -454,12 +441,8 @@ public class BlogDao implements BookMarkDao{
 	//대댓글 작성
 	public int replyRewrite(Blog_Reply reply) {
 		int result = 0;
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
+
 		try {
-			conn = ds.getConnection();
 			int blog_reply_no = reply.getBlog_reply_no(); //현재 댓글의 번호
 			//대댓글 작성하려는 원댓글
 			String originsql = "select refer, depth, step from blog_reply where blog_reply_no = ?";
@@ -498,9 +481,9 @@ public class BlogDao implements BookMarkDao{
 			e.printStackTrace();
 		} finally {
 			try {
-				pstmt.close();
-				rs.close();
-				conn.close();
+				ConnectionHelper.close(rs);
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
 				
 			}
@@ -517,12 +500,8 @@ public class BlogDao implements BookMarkDao{
 		String blog_reply_no = reply.getParameter("blog_reply_no");
 		String reply_content = reply.getParameter("reply_content");
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		
 		try {
 			//TODO : 수정 시간 반영하기 (sysdate)
-			conn = ds.getConnection();
 			String sql = "update blog_reply set reply_content=? where blog_reply_no=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, reply_content);
@@ -533,8 +512,8 @@ public class BlogDao implements BookMarkDao{
 			System.out.println("replyEdit 예외 : " + e.getMessage());
 		} finally {
 			try {
-				pstmt.close();
-				conn.close();
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e2) {
 				
 			}
@@ -546,12 +525,8 @@ public class BlogDao implements BookMarkDao{
 	//댓글 삭제
 	public int replyDelete(int blog_reply_no) {
 		int result = 0;
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
 
 		try {
-			conn = ds.getConnection();
 			//String sql = "delete from blog_reply where blog_reply_no = ?";
 			String sql = "update blog_reply set del = 1 where blog_reply_no = ?";
 			pstmt = conn.prepareStatement(sql);
@@ -562,8 +537,8 @@ public class BlogDao implements BookMarkDao{
 			System.out.println("replyDelete 예외 : " + e.getMessage());
 		}finally {
 			try {
-				pstmt.close();
-				conn.close();
+				ConnectionHelper.close(pstmt);
+				ConnectionHelper.close(conn);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
