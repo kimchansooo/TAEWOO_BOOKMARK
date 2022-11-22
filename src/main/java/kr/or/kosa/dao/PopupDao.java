@@ -22,13 +22,21 @@ public class PopupDao {
 		sql="";
 	}
 	//공지사항 전체조회
-	public List<Popup> AllListPopup(){
+	public List<Popup> AllListPopup(int cpage , int pagesize){
 		List<Popup> pl = new ArrayList<Popup>();
 		
 		try {
-			sql = "select popup_no, id, popup_title, popup_filename, popup_date from popup";
+			conn=ConnectionHelper.getConnection("oracle");
+			sql = "select rownum popup_no, id, popup_title, popup_filename, popup_date from popup where rownum between ? and ?";
 			pstmt = conn.prepareStatement(sql);
+			
+			int start = cpage * pagesize - (pagesize -1); //1 * 5 - (5 - 1) >> 1
+			int end = cpage * pagesize; // 1 * 5 >> 5
+			
+			pstmt.setInt(1, end);
+			pstmt.setInt(2, start);
 			rs = pstmt.executeQuery();
+		
 			
 			while(rs.next()) {
 				Popup pu = new Popup();
@@ -43,6 +51,9 @@ public class PopupDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
+			ConnectionHelper.close(conn);
+			ConnectionHelper.close(pstmt);
+			ConnectionHelper.close(rs);
 			try {
 				
 			} catch (Exception e2) {
@@ -52,11 +63,31 @@ public class PopupDao {
 		
 		return pl;
 	}
+	//
+	public int totalPopupCount() {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		int totalcount = 0;
+		try {
+			conn = ConnectionHelper.getConnection("oracle");//연결객체
+			String sql = "select count(*) as cnt from popup";
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				totalcount = rs.getInt("cnt");
+			}
+		} catch (Exception e) {
+			System.out.println("totalBoardCount 예외 : " + e.getMessage());
+		}
+		return totalcount;
+	}
 	//공지사항 조건조회(title like조회)
 	public List<Popup> LikeListPopup(String title){
 		List<Popup> pl = new ArrayList<Popup>();
 		
 		try {
+			conn=ConnectionHelper.getConnection("oracle");
 			sql = "select popup_no, id, popup_title, popup_filename, popup_date from popup where popup_title like ?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, "%"+title+"%");
@@ -91,6 +122,7 @@ public class PopupDao {
 		int row = 0;
 		
 		try {
+			conn=ConnectionHelper.getConnection("oracle");
 			sql = "insert into popup(popup_no, id, popup_title, popup_filename, popup_date) values(popup_no_seq.nextval, ?, ?, ?, ?)";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, popup.getId());
@@ -117,6 +149,7 @@ public class PopupDao {
 		int row = 0;
 		
 		try {
+			conn=ConnectionHelper.getConnection("oracle");
 			sql = "delete from popup where popup_no=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, no);
@@ -140,6 +173,7 @@ public class PopupDao {
 		int row = 0;
 		
 		try {
+			conn=ConnectionHelper.getConnection("oracle");
 			sql = "update popup set popup_title=?, popup_filename=?, popup_date=? where popup_no=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, popup.getPopup_title());
@@ -166,6 +200,7 @@ public class PopupDao {
 		Popup pu = new Popup();
 		
 		try {
+			conn=ConnectionHelper.getConnection("oracle");
 			sql = "select popup_no, id, popup_title, popup_filename, popup_date from popup where popup_no=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, no);
@@ -181,6 +216,9 @@ public class PopupDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
+			ConnectionHelper.close(conn);
+			ConnectionHelper.close(pstmt);
+			ConnectionHelper.close(rs);
 			try {
 				
 			} catch (Exception e2) {
@@ -196,6 +234,7 @@ public class PopupDao {
 		List<Popup> pl = new ArrayList<Popup>();
 		
 		try {
+			conn=ConnectionHelper.getConnection("oracle");
 			sql = "select popup_no, id, popup_title, popup_filename, popup_date from popup where TO_CHAR(popup_date, 'YYYY-MM-DD HH24:MI:SS')>to_char(sysdate, 'YYYY-MM-DD HH24:MI:SS')";
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
@@ -213,6 +252,9 @@ public class PopupDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
+			ConnectionHelper.close(conn);
+			ConnectionHelper.close(pstmt);
+			ConnectionHelper.close(rs);
 			try {
 				
 			} catch (Exception e2) {
